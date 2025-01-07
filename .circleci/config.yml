@@ -50,5 +50,9 @@ workflows:
       - cancel-workflow:
           requires:
             - build: failed
+      - cancel-workflow:
+          requires:
             - test: failed
+      - cancel-workflow:
+          requires:
             - deploy: failed
