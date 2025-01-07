@@ -9,6 +9,13 @@ jobs:
       - run: echo "Building the project..."
       # - run: exit 1
 
+  continue:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run: echo "Continue the project..." && sleep 300
+
   test:
     docker:
       - image: cimg/base:current
@@ -41,6 +48,7 @@ workflows:
   my-workflow:
     jobs:
       - build
+      - continue
       - test:
           requires:
             - build
@@ -50,6 +58,9 @@ workflows:
       - cancel-workflow:
           requires:
             - build: failed
+      - cancel-workflow:
+          requires:
+            - continue: failed
       - cancel-workflow:
           requires:
             - test: failed
