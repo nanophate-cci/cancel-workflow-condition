@@ -1,0 +1,54 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run: echo "Building the project..."
+      # - run: exit 1
+
+  test:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run: echo "Running tests..."
+      - run: exit 1
+
+  deploy:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run: echo "Deploying the project..."
+      # - run: exit 1
+
+  cancel-workflow:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run: echo "Canceling workflow due to job failure."
+      - run: |
+          curl --request POST \
+          --url https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/cancel \
+          --header "Circle-Token: ${CIRCLECI_TOKEN}"
+      # Add any additional cleanup or notification steps here
+
+workflows:
+  version: 2
+  my-workflow:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+      - cancel-workflow:
+          requires:
+            - build: failed
+            - test: failed
+            - deploy: failed
